@@ -1,5 +1,6 @@
 package com.clone.marketcurly.service;
 
+
 import com.clone.marketcurly.dto.OrderRequestDto.OrderRequestDto;
 import com.clone.marketcurly.model.*;
 import com.clone.marketcurly.repository.CartRepository;
@@ -25,9 +26,9 @@ public class OrderService {
     private final OrderCartRepository orderCartRepository;
 
     @Transactional
-    public void saveOrder(OrderRequestDto orderRequestDto, UserDetailsImpl userDetails){
+    public void saveOrder(OrderRequestDto orderRequestDto, User user){
 
-        List<Cart> cartList = cartRepository.findAllByUserId(userDetails.getUser().getId());
+        List<Cart> cartList = cartRepository.findAllByUserId(user.getId());
         List<OrderCart> finalOrder = new ArrayList<>();
 
         for (Cart cart:cartList){
@@ -40,10 +41,12 @@ public class OrderService {
             finalOrder.add(orderCart);
             orderCartRepository.save(orderCart);
         }
-        Order order = new Order(userDetails.getUser(),orderRequestDto.getAddress(),finalOrder,orderRequestDto.getTotalPrice());
+        Order order = new Order(user,orderRequestDto.getAddress(),finalOrder,orderRequestDto.getTotalPrice());
         orderRepository.save(order);
-//        User user=userDetails.getUser();
-//        List<Cart> cartList=cartRepository.findAllByUserId(user.getId());
-//
+
+        for (Cart cart:cartList) {
+            Long id = cart.getId();
+            cartRepository.deleteById(id);
+        }
     }
 }

@@ -14,7 +14,7 @@ public class OrderCart {
     @Id
     private Long id;
 
-    //이건 없어도 될 듯...?if 주문취소 시에는 필요할 듯..?
+    //이건 없어도 될 듯...?if
 //    @ManyToOne
 //    private Order order;
 

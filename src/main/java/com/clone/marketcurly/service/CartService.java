@@ -32,46 +32,49 @@ public class CartService {
     @Transactional
     public void saveCart(Long productId, CartRequestDto cartRequestDto, UserDetailsImpl userDetails) {
 
-        // 장바구니에 담긴 한 상품의 수량
+        // 한개 장바구니 갯수
         int quantity = cartRequestDto.getQuantity();
+        System.out.println(quantity);
 
-        // 장바구니에 담긴 한 상품의 총가격(수량 x 가격)
+        // 한개 장바구니 상품의 종합가격
         int sum = cartRequestDto.getSum();
-
-        User user = userDetails.getUser();
+        System.out.println(sum);
 
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new IllegalArgumentException("제품이 존재하지 않습니다.")
-                );
+        );
 
         // 장바구니 제품 갯수 유효성검사
         if (quantity == 0) {
             throw new IllegalArgumentException("장바구니에 담을 갯수를 정해주세요");
         }
 
-        //유저와 상품아이디로 장바구니 하나를 찾아냄
         List<Cart> cartCheck = cartRepository.findAllByUserIdAndProductId(userDetails.getUser().getId(),productId);
+        System.out.println(cartCheck);
 
-        Cart cart = new Cart();
+        // 유저에 대한 유효성검사
+        User user = userRepository.findById(userDetails.getUser().getId()).orElseThrow(
+                () -> new IllegalArgumentException("유저가 존재하지 않습니다.")
+        );
+        System.out.println(user.getUsername());
 
-        //장바구니에 이미 해당 상품이 담겨있는 경우
+
         if (cartCheck.size() > 0) {
             for(Cart carts : cartCheck) {
-                //메인 화면에서 장바구니 모양 눌렀을 경우(기존 수량에 고른 갯수만큼 더 더해줌)
                 carts.setQuantity(carts.getQuantity() + quantity);
                 carts.setSum(carts.getSum() + sum);
                 cartRepository.save(carts);
             }
         } else {
-            cart.setUser(user);
-            cart.setProductId(productId);
-            cart.setQuantity(quantity);
-            cart.setSum(sum);
+            Cart cart = new Cart(user , productId, quantity, sum);
+//            cart.setUser(user);
+//            cart.setProductId(productId);
+//            cart.setQuantity(quantity);
+            //  cart.setSum(sum);
             cartRepository.save(cart);
         }
     }
 
-    /*유저의 장바구니 조회*/
     public List<CartResponseDto> showCart(UserDetailsImpl userDetails) {
         // cartResponsDto에 brand, imgUrl, name, price, quntity를 보내줌
         List<CartResponseDto> cartResponseDtolist = new ArrayList<>();

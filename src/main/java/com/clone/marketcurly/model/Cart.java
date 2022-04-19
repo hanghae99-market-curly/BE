@@ -15,12 +15,16 @@ import java.util.List;
 @Setter
 @Entity
 public class Cart extends Timestamped {
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_ID")
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "Orders")
+//    private Order order;
+
+    @ManyToOne//(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_Id")
     private User user;
 
     @Column(nullable = false)
@@ -32,7 +36,7 @@ public class Cart extends Timestamped {
     @Column(nullable = false)
     private int sum;
 
-    public void cart(User user, Long productId, int quantity, int sum) {
+    public Cart(User user, Long productId, int quantity, int sum) {
         this.user = user;
         this.productId = productId;
         this.quantity = quantity;
